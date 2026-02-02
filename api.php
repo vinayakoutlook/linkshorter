@@ -1,6 +1,9 @@
 <?php
+require_once __DIR__ . '/env.php';
 session_start();
 header('Content-Type: application/json');
+
+$dataFile = env('DATA_FILE', __DIR__ . '/data/links.txt');
 
 // Check authentication
 if (!isset($_SESSION['admin_logged_in']) || $_SESSION['admin_logged_in'] !== true) {
@@ -8,9 +11,6 @@ if (!isset($_SESSION['admin_logged_in']) || $_SESSION['admin_logged_in'] !== tru
     echo json_encode(['success' => false, 'message' => 'Unauthorized']);
     exit;
 }
-
-$config = require 'config.php';
-$dataFile = $config['data_file'];
 
 // Ensure data directory exists
 $dataDir = dirname($dataFile);
@@ -38,9 +38,7 @@ function generateId() {
 }
 
 function shortenUrl($url) {
-    global $config;
-    
-    $apiUrl = $config['api_url'] . '?api=' . $config['api_key'] . '&url=' . urlencode($url);
+    $apiUrl = env('API_URL') . '?api=' . env('API_KEY') . '&url=' . urlencode($url);
     
     $ch = curl_init();
     curl_setopt($ch, CURLOPT_URL, $apiUrl);

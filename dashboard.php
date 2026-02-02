@@ -1,6 +1,6 @@
 <?php
+require_once __DIR__ . '/env.php';
 session_start();
-$config = require 'config.php';
 
 // Check authentication
 if (!isset($_SESSION['admin_logged_in']) || $_SESSION['admin_logged_in'] !== true) {
@@ -9,7 +9,8 @@ if (!isset($_SESSION['admin_logged_in']) || $_SESSION['admin_logged_in'] !== tru
 }
 
 // Check session timeout
-if (isset($_SESSION['login_time']) && (time() - $_SESSION['login_time'] > $config['session_lifetime'])) {
+$sessionLifetime = (int)env('SESSION_LIFETIME', 3600);
+if (isset($_SESSION['login_time']) && (time() - $_SESSION['login_time'] > $sessionLifetime)) {
     session_destroy();
     header('Location: index.php?timeout=1');
     exit;
@@ -17,11 +18,11 @@ if (isset($_SESSION['login_time']) && (time() - $_SESSION['login_time'] > $confi
 
 // Load links from file
 function loadLinks() {
-    global $config;
-    if (!file_exists($config['data_file'])) {
+    $dataFile = env('DATA_FILE', __DIR__ . '/data/links.txt');
+    if (!file_exists($dataFile)) {
         return [];
     }
-    $content = file_get_contents($config['data_file']);
+    $content = file_get_contents($dataFile);
     return $content ? json_decode($content, true) : [];
 }
 
@@ -35,7 +36,7 @@ $totalClicks = array_sum(array_column($links, 'clicks'));
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Dashboard - <?php echo $config['app_name']; ?></title>
+    <title>Dashboard - <?php echo env('APP_NAME', 'Link Sorter Pro'); ?></title>
     <link rel="stylesheet" href="assets/style.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 </head>
@@ -47,7 +48,7 @@ $totalClicks = array_sum(array_column($links, 'clicks'));
                 <div class="logo">
                     <i class="fas fa-link"></i>
                 </div>
-                <h2><?php echo $config['app_name']; ?></h2>
+                <h2><?php echo env('APP_NAME', 'Link Sorter Pro'); ?></h2>
             </div>
             
             <nav class="sidebar-nav">

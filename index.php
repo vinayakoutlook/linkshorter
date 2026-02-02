@@ -1,6 +1,6 @@
 <?php
+require_once __DIR__ . '/env.php';
 session_start();
-$config = require 'config.php';
 
 // Redirect if already logged in
 if (isset($_SESSION['admin_logged_in']) && $_SESSION['admin_logged_in'] === true) {
@@ -13,8 +13,9 @@ $error = '';
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $username = $_POST['username'] ?? '';
     $password = $_POST['password'] ?? '';
-    
-    if ($username === $config['admin_username'] && $password === $config['admin_password']) {
+    $adminUser = env('ADMIN_USERNAME', 'admin');
+    $adminPass = env('ADMIN_PASSWORD', 'admin123');
+    if ($username === $adminUser && $password === $adminPass) {
         $_SESSION['admin_logged_in'] = true;
         $_SESSION['login_time'] = time();
         header('Location: dashboard.php');
@@ -29,7 +30,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Login - <?php echo $config['app_name']; ?></title>
+    <title>Login - <?php echo env('APP_NAME', 'Link Sorter Pro'); ?></title>
     <link rel="stylesheet" href="assets/style.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 </head>
@@ -40,7 +41,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 <div class="logo">
                     <i class="fas fa-link"></i>
                 </div>
-                <h1><?php echo $config['app_name']; ?></h1>
+                <h1><?php echo env('APP_NAME', 'Link Sorter Pro'); ?></h1>
                 <p>Admin Dashboard</p>
             </div>
             
